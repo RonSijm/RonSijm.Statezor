@@ -29,7 +29,7 @@ public static class AddLocalStorageState
 
                 return result;
             },
-            Criteria = type => type == typeof(T)
+            TypeCriteria = type => type == typeof(T)
         });
     }
 
@@ -44,7 +44,7 @@ public static class AddLocalStorageState
                 var localStorageService = serviceProvider.GetService<ILocalStorageService>();
                 await localStorageService.SetItemAsync(name, obj);
             },
-            Criteria = type => type == typeof(T)
+            TypeCriteria = type => type == typeof(T)
         });
     }
 }

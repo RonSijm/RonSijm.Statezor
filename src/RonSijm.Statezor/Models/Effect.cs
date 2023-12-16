@@ -1,29 +1,66 @@
 ﻿namespace RonSijm.Statezor.Models;
 
-public interface IEffect
-{
-    Func<Type, bool> Criteria { get; set; }
-}
-
 public class Effect<T> : IEffect
 {
-    public Func<Type, bool> Criteria { get; set; }
-    public Func<T, Task> Action { get; set; }
+    public virtual Func<Type, bool> TypeCriteria { get; set; }
+    public virtual Func<T, bool> Criteria { get; set; }
+    public virtual Func<T, Task> Action { get; set; }
 }
 
-public interface IEffectResult : IEffect
+public abstract class Reducer<TOut, T> : Effect<T>
 {
-    object GetValue();
+    public override Func<Type, bool> TypeCriteria => type => type == typeof(TOut);
+
+    private readonly IState<TOut> _currentState;
+
+    protected Reducer(IState<TOut> currentState)
+    {
+        _currentState = currentState;
+    }
+
+    public override Func<T, Task> Action => input =>
+    {
+        _currentState.Publish(GetValue(input));
+        return Task.CompletedTask;
+    };
+
+    protected abstract TOut GetValue(T input);
+}
+
+public abstract class FuncReducer<TOut, T> : Effect<T>
+{
+    private readonly IState<TOut> _currentState;
+
+    protected FuncReducer(IState<TOut> currentState)
+    {
+        _currentState = currentState;
+    }
+
+    public override Func<T, Task> Action => input =>
+    {
+        _currentState.Publish(Factory(input));
+        return Task.CompletedTask;
+    };
+
+    protected abstract Func<T, TOut> Factory { get; set; }
 }
 
 // ReSharper disable once UnusedTypeParameter
 public class Effect<T, TOut> : IEffectResult
 {
-    public Func<Type, bool> Criteria { get; set; }
-    public Func<TOut> Action { get; set; }
-
+    public virtual Func<Type, bool> TypeCriteria { get; set; }
     public object GetValue()
+    {
+        return GetTypedValue();
+    }
+
+    public TOut GetTypedValue()
     {
         return Action.Invoke();
     }
+
+    public virtual Func<T, bool> Criteria { get; set; }
+    public virtual Func<TOut> Action { get; set; }
+
+
 }

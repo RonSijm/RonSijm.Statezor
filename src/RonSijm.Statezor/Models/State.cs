@@ -33,6 +33,14 @@ public class State<T> : IState<T>
         }
     }
 
+    public void Publish(T state)
+    {
+        Console.WriteLine($"Publishing {typeof(T)}");
+
+        Value = state;
+        _stateStore.SetState(Value);
+    }
+
     public T Value { get; set; }
-    public List<Effect<T>> Effects { get; set; }
+    public List<Effect<T>> Effects { get; set; } = new();
 }

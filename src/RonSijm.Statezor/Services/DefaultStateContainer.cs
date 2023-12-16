@@ -10,7 +10,7 @@ public class DefaultStateContainer
     {
         var state = new State<T>(stateStore);
 
-        var effect = Effects.FirstOrDefault(x => x.Criteria.Invoke(typeof(T)));
+        var effect = Effects.FirstOrDefault(x => x.TypeCriteria.Invoke(typeof(T)));
 
         if (effect != null)
         {

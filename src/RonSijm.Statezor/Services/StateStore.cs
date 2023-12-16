@@ -8,7 +8,7 @@ public class StateStore
     }
 
     private readonly List<(WeakReference<ComponentBase> Subscriber, Type TargetType)> _subscribers = new();
-    private readonly List<IState> _states = new();
+    internal readonly List<IState> _states = new();
 
     public readonly List<IEffect> Effects = new();
 
@@ -47,13 +47,17 @@ public class StateStore
 
         if (stateObject.Effects == null)
         {
-            var effects = Effects.Where(x => x.Criteria.Invoke(typeof(T)));
+            var effects = Effects.Where(x => x.TypeCriteria.Invoke(typeof(T)));
             stateObject.Effects = effects.Cast<Effect<T>>().ToList();
         }
 
         foreach (var effect in stateObject.Effects)
         {
-            effect.Action.Invoke(stateObject.Value);
+            // If there is no Criteria set, the action is accepted.
+            if (effect.Criteria == null || effect.Criteria(state))
+            {
+                effect.Action.Invoke(stateObject.Value);
+            }
         }
     }
 

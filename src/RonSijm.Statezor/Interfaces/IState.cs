@@ -8,6 +8,7 @@ public interface IState<T> : IState
     List<Effect<T>> Effects { get; set; }
 
     void Update(Action<T> update);
+    void Publish(T state);
 }
 
 public interface IState
