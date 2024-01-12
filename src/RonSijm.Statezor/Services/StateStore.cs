@@ -1,18 +1,11 @@
 ﻿namespace RonSijm.Statezor.Services;
 
-public class StateStore
+public class StateStore(DefaultStateContainer defaultState)
 {
-    public StateStore(DefaultStateContainer defaultState)
-    {
-        _defaultState = defaultState;
-    }
-
     private readonly List<(WeakReference<ComponentBase> Subscriber, Type TargetType)> _subscribers = new();
-    internal readonly List<IState> _states = new();
+    private readonly List<IState> _states = new();
 
     public readonly List<IEffect> Effects = new();
-
-    private readonly DefaultStateContainer _defaultState;
 
     public IState<T> GetState<T>() where T : new()
     {
@@ -21,7 +14,7 @@ public class StateStore
             return existingState;
         }
 
-        var state = _defaultState.GetState<T>(this);
+        var state = defaultState.GetState<T>(this);
         _states.Add(state);
 
         return state;
@@ -34,7 +27,7 @@ public class StateStore
             return existingState;
         }
 
-        var state = _defaultState.GetState(type, this);
+        var state = defaultState.GetState(type, this);
         _states.Add(state);
 
         return state;

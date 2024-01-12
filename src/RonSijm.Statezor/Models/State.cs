@@ -35,10 +35,21 @@ public class State<T> : IState<T>
 
     public void Publish(T state)
     {
+        PublishState = StateType.Publishing;
         Console.WriteLine($"Publishing {typeof(T)}");
 
         Value = state;
         _stateStore.SetState(Value);
+        PublishState = StateType.Published;
+    }
+
+    public StateType PublishState { get; set; }
+
+    public async Task Publish(Func<Task<T>> stateFactory)
+    {
+        PublishState = StateType.Publishing;
+        var state = await stateFactory();
+        Publish(state);
     }
 
     public T Value { get; set; }

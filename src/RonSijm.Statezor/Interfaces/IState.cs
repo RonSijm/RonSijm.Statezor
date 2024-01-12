@@ -9,6 +9,8 @@ public interface IState<T> : IState
 
     void Update(Action<T> update);
     void Publish(T state);
+
+    Task Publish(Func<Task<T>> stateFactory);
 }
 
 public interface IState
@@ -17,4 +19,6 @@ public interface IState
 
     Type ForType { get; }
     void Unsubscribe(ComponentBase subscriberComponent);
+
+    StateType PublishState { get; }
 };
