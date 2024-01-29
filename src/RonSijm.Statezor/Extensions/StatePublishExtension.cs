@@ -18,6 +18,12 @@ public static class StatePublishExtension
         }
     }
 
+    public static async Task PublishIfDifferent<T>(this IState<T> state, Func<Task<T>> stateFactory)
+    {
+        var stateValue = await stateFactory();
+        PublishIfDifferent(state, stateValue);
+    }
+
     public static void PublishIfDifferent<T>(this IState<T> state, T stateValue)
     {
         if (state.Value == null && stateValue == null)
